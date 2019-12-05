@@ -1,0 +1,79 @@
+---
+title: "HW10 - Ordination"
+author: "Evan Batzer"
+date: "December 5, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Overview
+
+##### Dune
+
+dune is a data frame of observations of species abundances at different sites. 
+
+##### Dune.env
+
+dune.env is a data frame of the following variables:
+
+A1: a numeric vector of thickness of soil A1 horizon.
+
+Moisture: an ordered factor with levels: 1 < 2 < 4 < 5.
+
+Management: a factor with levels: BF (Biological farming), HF (Hobby farming), NM (Nature Conservation Management), and SF (Standard Farming).
+
+Use: an ordered factor of land-use with levels: Hayfield < Haypastu < Pasture.
+
+Manure: an ordered factor with levels: 0 < 1 < 2 < 3 < 4.
+
+________________________________________________________________________________
+
+### Questions
+
+#### 1. Call and provide a basic overview of the `dune` datasets from the `vegan` package. You will need to retrieve both the community data, `dune`, and the associated environmental data, `dune.env`.  
+
+*Answer the following:*   
+1. How many species and samples are included in the community dataset?
+2. How many environmental attributes were measured in the environmental dataset?
+3. What is the average abundance of each species across all samples? Sort these in descending order.
+
+#### Answer:
+
+```{r}
+library(vegan)
+
+data(dune)
+data(dune.env)
+
+dim(dune) # 20 samples, 30 species
+dim(dune.env) # 20 samples, 5 attributes
+
+sort(colMeans(dune), decreasing = TRUE)
+```
+
+#### 2. Produce a heatmap of the abundances of species across samples
+
+#### Answer:
+
+```{r}
+tabasco(dune)
+```
+
+#### 3. What do you notice about species distributions in this dataset? Is this dataset well-suited to common ordination approaches in ecology?
+
+#### Answer:
+
+#### 4. Visualize these samples using non-metric multidimensional scaling (NMDS). Use the Bray-Curtis (`bray`) dissimilarity metric. Color sites by the "Use" environmental factor.
+
+__Note:__ To set custom colors, you will need to first call `ordiplot(nmds_object, type = "n")`, then add points from the nmds with points()
+
+```{r}
+my_nmds <- metaMDS(dune, distance = "bray")
+
+ordiplot(my_nmds, type = "n")
+points(my_nmds, "sites", col = dune.env$Use)
+```
+

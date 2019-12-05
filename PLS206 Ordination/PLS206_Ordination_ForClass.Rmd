@@ -11,7 +11,7 @@ ________________________________________________________________________________
 
 In previous lessons, we covered the use of principle component analysis (PCA) to reduce the dimensionality of numerous, collinear predictor (X) variables. However, the process of dimensionality reduction is not limited just to predictors -- PCA and related techniques can be used to describe major axes of variation in a multivariate response (Y) variable.
 
-*When do are we likely to have a multivariate response variable?* In ecology and other life sciences, species composition data is increasingly used as a response -- think counts of plants occurring in different conservation areas or comparisons of gut microbiomes across different diets. The simplest approach to analyzing this sort of data would be to ask if the first species I found increases in response to some environmental factor, then repeat this univariate model for every species found. However, this approach would be tedious, miss out on key correlations between species, and suffer from multiple comparison problems.
+*When do are we likely to have a multivariate response variable?* In ecology and other life sciences, species composition data is increasingly used as a response -- think counts of plants occurring in different conservation areas or comparisons of gut microbiomes across different diets. The simplest approach to analyzing this sort of data would be to ask if the first species I found increases in response to some environmental factor, then repeat this univariate model for every species found. However, this approach would be tedious, miss out on key correlations between species, and suffer from multiple comparison problems. 
 
 Instead, we often want to evaluate how environmental factors control the abundance of multiple species *simultaneously*. The process of decomposing a species matrix, containing counts of different species (columns) by samples (rows) into a smaller number of gradients is known as __ordination__.
 
@@ -124,7 +124,7 @@ $$2. d(x, y) = 0 \iff x = y$$
 
 __Distances are symmetric; It doesn't matter where your starting point is__
 $$3. d(x, y) = d(y, x)$$
-__Triangle inequalty; a distance between two communities is greater than or equal to the distance between those two communities and a third__
+__Triangle inequalty; a distance between two communities is less than or equal to the distance between those two communities and a third__
 $$4. d(x, y) \leq d(x, z) + d(z, y)$$
 
 __Note:__ The last property is often violated by several popular ecological distance functions. In this case, these distances are considered "semimetric". Bray-Curtis (Sorenson) dissimilarity is a popular metric that violates this property. 
@@ -150,20 +150,22 @@ __Euclidean__ $$\sqrt{\sum_{i=1}^S (n_{1i} - n_{2i})^2}$$
 * $n_{1i}$ = abundance of species $i$ in site 1
 * $n_{2i}$ = abundance of species $i$ in site 2
 * $S$ = total number of species
+* *What is the total deviation in units of abundance between two communities*?
 
 __Bray-Curtis:__ $$\sum_{i=1}^S \frac{2 * min(n_{1i}, n_{2i})}{\sum{n_{1i}} + \sum{n_2i}}$$ 
 
 * $n_{1i}$ = abundance of species $i$ in site 1
 * $n_{2i}$ = abundance of species $i$ in site 2
 * $S$ = total number of species
+* *What proportion of total species abundances differ between two communities*?
+
 
 __Jaccard:__ $$\frac{A}{A + B+ C}$$
 
 * $A:$ number of species in both sites
 * $B:$ number of species in first site only
 * $C:$ number of species in second site only
-
-
+* *What proportion of the combined species pool is found between two communities*?
 
 ```{r}
 # 2 Example ecological communities
