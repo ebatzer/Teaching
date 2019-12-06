@@ -34,7 +34,6 @@ ________________________________________________________________________________
 ### Questions
 
 #### 1. Call and provide a basic overview of the `dune` datasets from the `vegan` package. You will need to retrieve both the community data, `dune`, and the associated environmental data, `dune.env`.  
-
 *Answer the following:*   
 1. How many species and samples are included in the community dataset?
 2. How many environmental attributes were measured in the environmental dataset?
@@ -66,14 +65,80 @@ tabasco(dune)
 
 #### Answer:
 
-#### 4. Visualize these samples using non-metric multidimensional scaling (NMDS). Use the Bray-Curtis (`bray`) dissimilarity metric. Color sites by the "Use" environmental factor.
-
-__Note:__ To set custom colors, you will need to first call `ordiplot(nmds_object, type = "n")`, then add points from the nmds with points()
+#### 4. Visualize these samples using non-metric multidimensional scaling (NMDS). Use the Bray-Curtis (`bray`) dissimilarity metric. Plot this output using `ordiplot()`. Add environmental vectors with `envfit()`
 
 ```{r}
+# Running unconstrained ordination
 my_nmds <- metaMDS(dune, distance = "bray")
+ordiplot(my_nmds)
 
-ordiplot(my_nmds, type = "n")
-points(my_nmds, "sites", col = dune.env$Use)
+# Adding environmental variables
+env_vecs <- envfit(my_nmds, env = dune.env)
+env_vecs
+plot(env_vecs)
+```
+
+#### 5. Interpretation
+
+__Using the above plot, answer:__
+
+1. Which variables appear significantly correlated with the unconstrained ordination?  
+
+2. What is the default behavior of the `envfit` plot for different variable types? Why do some points show arrows, while others are text? Check `?envfit` for help.
+
+__Using the plot below, answer:__
+
+3. Compare and interpret the following plots that use different dissimilarity indices. What do repeated ordinations with different metrics tell you about the different properties of a community?
+
+```{r}
+nmds_bray <- metaMDS(dune, distance = "bray", trace = FALSE)
+ordiplot(nmds_bray, main = "NMDS - Bray-Curtis Dissimilarity")
+ordiellipse(nmds_bray, 
+            dune.env$Manure, 
+            col = rainbow(5),
+            draw = "polygon", 
+            label = TRUE)
+
+nmds_jacc <- metaMDS(dune, distance = "jaccard", binary = TRUE, trace = FALSE)
+ordiplot(nmds_jacc, main = "NMDS - Jaccard Dissimilarity")
+ordiellipse(nmds_jacc, 
+            dune.env$Manure, 
+            col = rainbow(5), 
+            draw = "polygon", 
+            label = TRUE)
+```
+
+#### 6. Constrained ordination
+
+To test the combinations of predictors that best *constrain* the variation between communities, we can perform a *redundancy analysis* using our set of environmental predictors. 
+
+1. Perform a redundancy analysis (`rda`) of the dune community using all environmental predictors.
+
+```{r}
+myrda <- rda(dune ~ ., dune.env)
+```
+
+2. Check the summary output of the `rda` object. What are the eigenvalues of the first 2 RDA axes? How much overall variation do they explain?
+
+3. Again using the summary output, what are the eigenvalues of the residual (unconstrained) axes? Do you think there are other key environmental gradients that we miss in our sampling?  
+
+*Hint:* Look back at rules for selecting and interpreting PCA axes in multiple linear regression. What sort of eigenvalue patterns tend to show strong synthetic gradients?
+
+4. Test the fit of the overall model using `anova`. Interpret the test results
+
+```{r}
+
+```
+
+5. Plot the ordination.
+
+```{r}
+ordifinal <- ordistep(myrda)
+```
+
+6. Plot this final ordination and interpret your plot
+
+```{r}
+plot(ordifinal)
 ```
 
