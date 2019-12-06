@@ -141,14 +141,14 @@ Distance in lat-long space is referred to as __Euclidean distance__. Euclidean d
 Distance metrics have certain properties:
 
 __Distances are always greater than or equal to 0__
-$$1. d(x, y) \leq 0$$
+$$1. d(x, y) \geq 0$$
 
 __A distance of zero means that samples are identical__
 $$2. d(x, y) = 0 \iff x = y$$
 
 __Distances are symmetric; It doesn't matter where your starting point is__
 $$3. d(x, y) = d(y, x)$$
-__Triangle inequalty; a distance between two communities is greater than or equal to the distance between those two communities and a third__
+__Triangle inequalty; a distance between two communities is less than or equal to the summed distance between those two communities and a third__
 $$4. d(x, y) \leq d(x, z) + d(z, y)$$
 
 __Note:__ The last property is often violated by several popular ecological distance functions. In this case, these distances are considered "semimetric". Bray-Curtis (Sorenson) dissimilarity is a popular metric that violates this property. 
@@ -180,6 +180,7 @@ __Euclidean__ $$\sqrt{\sum_{i=1}^S (n_{1i} - n_{2i})^2}$$
 * $n_{1i}$ = abundance of species $i$ in site 1
 * $n_{2i}$ = abundance of species $i$ in site 2
 * $S$ = total number of species
+* *What is the total deviation in units of abundance between two communities*?
 
 <br>
 
@@ -189,6 +190,7 @@ __Bray-Curtis:__ $$\sum_{i=1}^S \frac{2 * min(n_{1i}, n_{2i})}{\sum{n_{1i}} + \s
 * $n_{1i}$ = abundance of species $i$ in site 1
 * $n_{2i}$ = abundance of species $i$ in site 2
 * $S$ = total number of species
+* *What proportion of total species abundances differ between two communities*?
 
 <br>
 
@@ -197,6 +199,7 @@ __Jaccard:__ $$\frac{A}{A + B+ C}$$
 * $A:$ number of species in both sites
 * $B:$ number of species in first site only
 * $C:$ number of species in second site only
+* *What proportion of the combined species pool is found between two communities*?
 
 <br>
 
@@ -353,7 +356,7 @@ The counterpart to linear regression in ordination is known as *constrained* ord
 Constrained ordination combines both multiple linear regression and PCA to estimate how environmental variables can be combined to produce environmental gradients that capture changes in species abundance.
 
 <center>
-[From Legendre and Legendre 1998](Constrained_Fig.png)
+![From Legendre and Legendre 1998](Constrained_Fig.png)
 </center>
 
 Constrained ordination produces both a matrix of explained variation that can be visualized through a PCA, as well as a matrix of unexplained variation that may be visualized as a separate PCA.
