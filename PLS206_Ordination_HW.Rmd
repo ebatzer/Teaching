@@ -5,11 +5,11 @@ date: "December 5, 2019"
 output: html_document
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+________________________________________________________________________________
 
 ### Overview
+
+For this homework, we will be using another set of built-in datasets in the `vegan` package. You will need to load the data, characterize the observations, and performed unconstrained and constrained ordination to complete this assignment.
 
 ##### Dune
 
@@ -31,13 +31,13 @@ Manure: an ordered factor with levels: 0 < 1 < 2 < 3 < 4.
 
 ________________________________________________________________________________
 
-### Questions
+### Sample Characterization
 
 #### 1. Call and provide a basic overview of the `dune` datasets from the `vegan` package. You will need to retrieve both the community data, `dune`, and the associated environmental data, `dune.env`.  
-*Answer the following:*   
-1. How many species and samples are included in the community dataset?
-2. How many environmental attributes were measured in the environmental dataset?
-3. What is the average abundance of each species across all samples? Sort these in descending order.
+*Answer the following:*     
+1. How many species and samples are included in the community dataset?  
+2. How many environmental attributes were measured in the environmental dataset?  
+3. What is the average abundance of each species across all samples? Sort these in descending order.  
 
 #### Answer:
 
@@ -53,6 +53,7 @@ dim(dune.env) # 20 samples, 5 attributes
 sort(colMeans(dune), decreasing = TRUE)
 ```
 
+
 #### 2. Produce a heatmap of the abundances of species across samples
 
 #### Answer:
@@ -61,11 +62,18 @@ sort(colMeans(dune), decreasing = TRUE)
 tabasco(dune)
 ```
 
+
 #### 3. What do you notice about species distributions in this dataset? Is this dataset well-suited to common ordination approaches in ecology?
 
 #### Answer:
 
-#### 4. Visualize these samples using non-metric multidimensional scaling (NMDS). Use the Bray-Curtis (`bray`) dissimilarity metric. Plot this output using `ordiplot()`. Add environmental vectors with `envfit()`
+Matrix is very sparse -- lots of species with only a few observations. Some species, like Planlanc and Poatriv seem very dominant. This is a fairly common pattern in community data.
+
+________________________________________________________________________________
+
+### Unconstrained Ordination
+
+#### 1. Visualize these samples using non-metric multidimensional scaling (NMDS). Use the Bray-Curtis (`bray`) dissimilarity metric. Plot this output using `ordiplot()`. Add environmental vectors with `envfit()` and `plot` them on top of the previous plot.
 
 ```{r}
 # Running unconstrained ordination
@@ -78,67 +86,103 @@ env_vecs
 plot(env_vecs)
 ```
 
-#### 5. Interpretation
+### Interpretation
 
 __Using the above plot, answer:__
 
-1. Which variables appear significantly correlated with the unconstrained ordination?  
+#### 2. Which variables appear significantly correlated with the unconstrained ordination?  
 
-2. What is the default behavior of the `envfit` plot for different variable types? Why do some points show arrows, while others are text? Check `?envfit` for help.
+#### Answer:
+
+All variables but "use"
+
+#### 3. What is the default behavior of the `envfit` plot for different variable types? Why do some points show arrows, while others are text? Check `?envfit` for help.
+
+#### Answer:
+
+Continuous variables show lines + arrows (vectors), factor variables reflect group means (centroids)
 
 __Using the plot below, answer:__
 
-3. Compare and interpret the following plots that use different dissimilarity indices. What do repeated ordinations with different metrics tell you about the different properties of a community?
+#### 4. Compare and interpret the following plots that use different dissimilarity indices. What do repeated ordinations with different metrics tell you about the different properties of a community?
+
+#### Answer:
 
 ```{r}
 nmds_bray <- metaMDS(dune, distance = "bray", trace = FALSE)
 ordiplot(nmds_bray, main = "NMDS - Bray-Curtis Dissimilarity")
 ordiellipse(nmds_bray, 
-            dune.env$Manure, 
-            col = rainbow(5),
+            dune.env$Management, 
+            col = rainbow(4),
             draw = "polygon", 
             label = TRUE)
 
 nmds_jacc <- metaMDS(dune, distance = "jaccard", binary = TRUE, trace = FALSE)
 ordiplot(nmds_jacc, main = "NMDS - Jaccard Dissimilarity")
 ordiellipse(nmds_jacc, 
-            dune.env$Manure, 
-            col = rainbow(5), 
+            dune.env$Management, 
+            col = rainbow(4), 
             draw = "polygon", 
             label = TRUE)
 ```
 
-#### 6. Constrained ordination
+Plotting factors shows group positions - centroids + ellipses in this case. Ellipses in this case highlight which groups tend to be similar to one another, and which tend to be more different. Important to note that these visualization techniques are useful for factors.  
+
+________________________________________________________________________________
+
+### Constrained ordination
 
 To test the combinations of predictors that best *constrain* the variation between communities, we can perform a *redundancy analysis* using our set of environmental predictors. 
 
-1. Perform a redundancy analysis (`rda`) of the dune community using all environmental predictors.
+#### 1. Perform a redundancy analysis (`rda`) of the dune community using "A1" and "Management" as environmental predictors.
+
+#### Answer:
 
 ```{r}
-myrda <- rda(dune ~ ., dune.env)
+myrda <- rda(dune ~ A1 + Management, dune.env)
 ```
 
-2. Check the summary output of the `rda` object. What are the eigenvalues of the first 2 RDA axes? How much overall variation do they explain?
 
-3. Again using the summary output, what are the eigenvalues of the residual (unconstrained) axes? Do you think there are other key environmental gradients that we miss in our sampling?  
+#### 2. Check the summary output of the `rda` object. What are the eigenvalues of the first 2 RDA axes? How much overall variation do they explain?
+
+#### Answer:
+
+```{r}
+summary(myrda)$cont
+```
+
+18% and 14% respectively, cumulative proportion = 32%.
+
+#### 3. Again using the summary output, what are the eigenvalues of the residual (unconstrained) axes? Do you think there are other key environmental gradients that we miss in our sampling?  
 
 *Hint:* Look back at rules for selecting and interpreting PCA axes in multiple linear regression. What sort of eigenvalue patterns tend to show strong synthetic gradients?
 
-4. Test the fit of the overall model using `anova`. Interpret the test results
+#### Answer:
 
 ```{r}
-
+summary(myrda)$cont
 ```
 
-5. Plot the ordination.
+PCA eigenvalues show relatively linear patterns -- little evidence of strong gradients that we have missed in sampling.
+
+#### 4. Test the fit of the overall model using `anova`. Interpret the test results
+
+#### Answer:
 
 ```{r}
-ordifinal <- ordistep(myrda)
+anova(myrda)
 ```
 
-6. Plot this final ordination and interpret your plot
+#### 5. Plot this ordination and interpret your plot
+
+#### Answer:
 
 ```{r}
-plot(ordifinal)
+plot(myrda)
 ```
 
+Vector associated with A1 shows a strong pattern driving variation across both RDA axes. Biological farming and Hobby farming show similarities in constrained species composition along both axes. Standard farming is particularly related to the second RDA axis, showing correlation with Agrostis stolonifera and Alopecurus geniculatus. 
+
+* Generally, looking for some consideration of the triplot, reflecting both sites, species, and environmental vectors * 
+
+________________________________________________________________________________
